@@ -1,0 +1,77 @@
+package frc.robot;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.NoteLimiterSubsystem;
+import frc.robot.subsystems.SensorSubsystem;
+
+public class Robot extends TimedRobot {
+
+  private Joystick joystick = new Joystick(0);
+
+  private final SensorSubsystem sensorSubsystem = new SensorSubsystem(); // Sistema de sensores
+
+  private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(); // Sistema de locomoção
+  private final ArmSubsystem arm = new ArmSubsystem(sensorSubsystem); // Sistema do braço
+  private final IntakeSubsystem intake = new IntakeSubsystem(sensorSubsystem); // Sistema de coleta
+  private final NoteLimiterSubsystem limiter = new NoteLimiterSubsystem(sensorSubsystem); // Sistema de limitação
+
+  @Override
+  public void robotInit() {}
+
+  @Override
+  public void robotPeriodic() {
+    // Chamado a cada ciclo do robô; atualiza os dados do sensor
+    sensorSubsystem.periodic();
+  }
+
+  @Override
+  public void autonomousInit() {}
+
+  @Override
+  public void autonomousPeriodic() {}
+
+  @Override
+  public void teleopInit() {}
+
+  @Override
+  public void teleopPeriodic() {
+    // Funções para o controle do robô no período teleoperado
+    controlMovement(); // Controla a movimentação
+    controlArm();      // Controla o Braço 
+    controlIntake();   // Controla o intake
+    controlLimiter();  // Controla o tecnil Limiter 
+  }
+
+  private void controlMovement() {
+    // Controle do movimento do robô
+    double speed = joystick.getRawAxis(1); // Eixo Y do joystick
+    double rotation = joystick.getRawAxis(2); // Eixo X do joystick
+    double multiplier = joystick.getRawAxis(3); // Multiplicador de velocidade
+    boolean get2 = joystick.getRawButton(2); // Botão adicional
+
+    drivetrain.drive(speed, rotation, multiplier, get2); // Comando de locomoção
+  }
+
+  private void controlArm() {
+    // Controle do braço do robô
+    int pov = joystick.getPOV(0); // Posição do POV do joystick
+    arm.moveArm(pov); // Comando para mover o braço
+  }
+
+  private void controlIntake() {
+    // Controle do sistema de coleta
+    boolean get1 = joystick.getRawButton(1); // Botão para coletar
+    boolean get3 = joystick.getRawButton(3); // Botão para passar
+
+    intake.collect_pass(get1, get3); // Comando para coleta ou passagem
+  }
+
+  private void controlLimiter() {
+    // Controle do sistema de limitação
+    limiter.noteLimiter(); // Comando para o sistema de limitação
+  }
+}

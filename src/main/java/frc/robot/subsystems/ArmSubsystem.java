@@ -1,0 +1,28 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class ArmSubsystem extends SubsystemBase {
+
+  private VictorSPX armMotor = new VictorSPX(6); // Motor do braço
+  private SensorSubsystem sensorSubsystem;
+
+  public ArmSubsystem(SensorSubsystem sensorSubsystem) {
+    this.sensorSubsystem = sensorSubsystem;
+  }
+
+  public void moveArm(int pov) {
+    // Se o POV estiver em 0 graus, o motor do braço irá subir
+    if (pov == 0 && sensorSubsystem.isUpLimitReached()) {
+      armMotor.set(ControlMode.PercentOutput, 0.7);
+    // Se o POV estiver em 180 graus, o motor do braço irá descer
+    } else if (pov == 180 && sensorSubsystem.isDownLimitReached()) {
+      armMotor.set(ControlMode.PercentOutput, -0.5);
+    // Caso contrário, o motor ficará em posição estática
+    } else {
+      armMotor.set(ControlMode.PercentOutput, 0);
+    }
+  }
+}

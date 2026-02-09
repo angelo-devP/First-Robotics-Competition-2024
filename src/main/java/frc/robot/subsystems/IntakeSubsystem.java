@@ -1,0 +1,32 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class IntakeSubsystem extends SubsystemBase {
+
+  private VictorSPX intakeMotor = new VictorSPX(7);  // Motor da coleta 1
+  private VictorSPX intakeMotor2 = new VictorSPX(8); // Motor da coleta 2
+  private SensorSubsystem sensorSubsystem;
+
+  public IntakeSubsystem(SensorSubsystem sensorSubsystem) {
+    this.sensorSubsystem = sensorSubsystem;
+  }
+
+  public void collect_pass(boolean collect, boolean pass) {
+    // Se a coleta estiver ativa e o sensor de coleta não estiver acionado, o motor irá funcionar
+    if (collect && sensorSubsystem.isCollectSwitchActive()) {
+      intakeMotor.set(ControlMode.PercentOutput, 0.6);
+      intakeMotor2.set(ControlMode.PercentOutput, 0.6);
+    // Se o passe estiver ativo, o sensor de coleta não estiver acionado e o sensor do braço não estiver acionado, os motores funcionarão em sentido inverso
+    } else if (pass && sensorSubsystem.isCollectSwitchActive() && sensorSubsystem.isDownLimitReached()) {
+      intakeMotor.set(ControlMode.PercentOutput, -1.0);
+      intakeMotor2.set(ControlMode.PercentOutput, -1.0);
+    } else {
+      // Caso contrário, os motores ficarão em posição estática
+      intakeMotor.set(ControlMode.PercentOutput, 0);
+      intakeMotor2.set(ControlMode.PercentOutput, 0);
+    }
+  }
+}
